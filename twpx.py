@@ -2,15 +2,19 @@ import tweepy
 from time import sleep
 import sys
 import re
+import os
+from dotenv import load_dotenv
 
 #正規表現
 rege_pixiv = r'.*pixiv.*'
 
-consumer_key = ""
-consumer_secret = ""
-access_token = ""
-access_token_secret = ""
-
+#.envロード
+load_dotenv()
+consumer_key = os.getenv("API_KEY")
+consumer_secret = os.getenv("SECRET_KEY")
+access_token = os.getenv("ACCESS_TOKEN")
+access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
+#認証
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 
