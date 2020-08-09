@@ -28,9 +28,14 @@ list_pixivlinks=[]
 #pixiv取得
 for following in hataraku_data:
     status_date=api.get_user(following)
+    print(status_date.name)#debug
     #url欄
     try:
         status_url=status_date.entities["url"]["urls"][0]["expanded_url"]
+        if not status_url:
+            status_url=status_date.entities["url"]["urls"][0]["url"]
+            if not status_url:
+                status_url=''
     except:
         status_url=''
     if re.match(rege_pixiv,status_url) != None:
@@ -48,5 +53,5 @@ for following in hataraku_data:
     sleep(1)
 
 #データフレームに変換してcsv出力
-df_pixivlinks=pd.DataFrame(list_pixivlinks)
+df_pixivlinks=pd.DataFrame(list_pixivlinks,columns=["name","url"]).fillna(False)
 df_pixivlinks.to_csv(os.getcwd()+'/pixivlink.csv')
