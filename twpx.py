@@ -5,6 +5,7 @@ import re
 import os
 from dotenv import load_dotenv
 import pandas as pd
+from tweepy.error import RateLimitError
 
 #正規表現
 rege_pixiv = r'.*pixiv.*'
@@ -26,9 +27,21 @@ hataraku_data = api.friends_ids("M1nPy")
 
 list_pixivlinks=[]
 #pixiv取得
+n=0
 for following in hataraku_data:
-    status_date=api.get_user(following)
-    print(status_date.name)#debug
+    i=0
+    while True:
+        #制限かかったら1分に一回try、20回で終了
+        try:
+            i+=1
+            status_date=api.get_user(following)
+            break
+        except RateLimitError:
+            print(str(i)+"RateLimitError")#debug
+            if i>20:
+                sys.exit()
+            sleep(60)
+    print(str(n)+":"+status_date.name)#debug
     #url欄
     try:
         status_url=status_date.entities["url"]["urls"][0]["expanded_url"]
@@ -51,6 +64,7 @@ for following in hataraku_data:
         else:
             list_pixivlinks.append((status_date.name,None))
     sleep(1)
+    n+=1
 
 #データフレームに変換してcsv出力
 df_pixivlinks=pd.DataFrame(list_pixivlinks,columns=["name","url"]).fillna(False)
